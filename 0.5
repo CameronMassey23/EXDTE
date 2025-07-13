@@ -1,0 +1,44 @@
+import board
+import digitalio
+import time
+from adafruit_debouncer import Debouncer
+
+button_pin = digitalio.DigitalInOut(board.GP12)
+button_pin.direction = digitalio.Direction.INPUT
+button_pin.pull = digitalio.Pull.UP
+my_button = Debouncer(button_pin)
+
+
+led = digitalio.DigitalInOut(board.GP0)
+led.direction = digitalio.Direction.OUTPUT
+
+led1 = digitalio.DigitalInOut(board.GP1)
+led1.direction = digitalio.Direction.OUTPUT
+
+while True:
+    my_button.update()
+
+    if my_button.fell is True:
+        led.value = True
+        led1.value = False
+        time.sleep(0.5)
+    elif my_button.rose is True:
+        led.value = False
+        led1.value = True
+        time.sleep(0.5)
+    elif my_button.value is True:
+        led.value = False
+        led1.value = False
+        time.sleep(0.5)
+    elif my_button.value is False:
+        led.value = True
+        led1.value = True
+        time.sleep(0.5)
+
+
+
+
+
+
+
+
