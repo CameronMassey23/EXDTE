@@ -1,0 +1,42 @@
+# imports the required features
+import board
+import digitalio
+import time
+import analogio
+from adafruit_debouncer import Debouncer
+
+# Adds the blue led
+blue_led = digitalio.DigitalInOut(board.GP0)
+blue_led.direction = digitalio.Direction.OUTPUT
+
+# Adds the button
+button_pin = digitalio.DigitalInOut(board.GP15)
+button_pin.direction = digitalio.Direction.INPUT
+button_pin.pull = digitalio.Pull.UP
+button = Debouncer(button_pin) 
+
+knob = analogio.AnalogIn(board.A0)
+
+react_time = 1
+
+# Turns on the led
+blue_led.value = True
+while True:
+
+    button.update()
+    
+    time.sleep(0.01)
+    wait_time = knob.value/10000 + 1
+
+    if button.rose is True:
+        blue_led.value = False
+        time.sleep(0.1)
+        time.sleep(wait_time)
+        blue_led.value = True
+        react_time = 0
+
+    react_time += 0.01
+
+    if button.fell is True:
+        print(f"Your reaction time was {react_time} Seconds")
+    
