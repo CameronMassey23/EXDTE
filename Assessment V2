@@ -1,0 +1,67 @@
+# imports the required features
+import board
+import digitalio
+import time
+import pwmio
+import analogio
+from adafruit_debouncer import Debouncer
+
+# Adds the button
+button_pin = digitalio.DigitalInOut(board.GP15)
+button_pin.direction = digitalio.Direction.INPUT
+button_pin.pull = digitalio.Pull.UP
+button = Debouncer(button_pin)
+
+# Adds the knob
+knob = analogio.AnalogIn(board.A0)
+#Makes the blue leds brightness changeable through PWM
+blue_led = pwmio.PWMOut(board.GP0, frequency=1000)
+
+# Creates the timer variable
+react_time = 1
+# Creates a variable that tells the program if it is the users attempt or they are just intitaing the test
+attempt = False 
+
+# Turns on the led
+blue_led.duty_cycle = 1000
+# Creates a loop
+while True:
+
+    button.update()
+    #Adds a sleep to for the timer
+    time.sleep(0.01)
+    # Adjusts the wait time via the knob
+    wait_time = knob.value/10000 + 1
+    # Adjusts the buttons brightness in correlation with knob
+    blue_led.duty_cycle = knob.value
+
+    # Code to intiate the reaction time test
+    if button.rose is True:
+        # Turns the led off
+        blue_led.duty_cycle = 0
+        # Adds the delay which has been set by the user
+        time.sleep(wait_time)
+        # Turns the led back on
+        blue_led.duty_cycle = 1000
+        #Resets the timer
+        react_time = 0
+        #Tells the code the next button press is the attempt
+        attempt = True
+        
+
+
+    # Adds the time to the timer
+    react_time += 0.01
+    # Checks when button is pressed
+    if button.fell is True:
+        # Checks its the user attempt
+        if attempt is True:
+            # Prints the out put to the user 
+            print(f"""
+            -------------------------------------------
+            Your reaction time was {react_time} Seconds
+            -------------------------------------------""")
+            # Ends the code
+            break
+        
+ 
